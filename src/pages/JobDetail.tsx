@@ -2,17 +2,17 @@ import React, { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useData } from "@/contexts/DataContext";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -20,7 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -33,16 +33,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
 
-import { 
-  ArrowLeft, 
-  Calendar, 
-  FileEdit, 
-  Trash2, 
-  Plus, 
+import {
+  ArrowLeft,
+  Calendar,
+  FileEdit,
+  Trash2,
+  Plus,
   BarChart2,
   UserCog,
   ClipboardList,
-  Clock 
+  Clock
 } from "lucide-react";
 
 import { JobStatusBadge } from "@/components/jobs/JobStatusBadge";
@@ -51,18 +51,20 @@ import { TasksList } from "@/components/jobs/TasksList";
 import { JobTimeline } from "@/components/jobs/JobTimeline";
 import { JobStatusUpdater } from "@/components/jobs/JobStatusUpdater";
 import { JobReports } from "@/components/jobs/JobReports";
+import { StatusUpdates } from "@/components/jobs/StatusUpdates";
+import { StatusUpdatesApi } from "@/components/jobs/StatusUpdatesApi";
 import { formatCurrency } from "@/lib/formatters";
 
 const JobDetail = () => {
   const { jobId } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  const { 
-    getJobById, 
-    updateJob, 
-    deleteJob, 
-    getTasksByJobId, 
-    mockUsers, 
+  const {
+    getJobById,
+    updateJob,
+    deleteJob,
+    getTasksByJobId,
+    mockUsers,
     getClientById,
     getArchitectById
   } = useData();
@@ -117,11 +119,11 @@ const JobDetail = () => {
     navigate("/jobs");
   };
 
-  const canEdit = currentUser?.role === "admin" || 
+  const canEdit = currentUser?.role === "admin" ||
     (currentUser?.role === "client" && job.clientId === currentUser.id) ||
     (currentUser?.role === "architect" && job.architectId === currentUser.id && job.status === "in_progress");
 
-  const canDelete = currentUser?.role === "admin" || 
+  const canDelete = currentUser?.role === "admin" ||
     (currentUser?.role === "client" && job.clientId === currentUser.id && ["draft", "open"].includes(job.status));
 
   return (
@@ -160,7 +162,7 @@ const JobDetail = () => {
                     Make changes to the project details below.
                   </DialogDescription>
                 </DialogHeader>
-                <JobForm 
+                <JobForm
                   job={job}
                   clients={clients}
                   architects={architects}
@@ -355,7 +357,19 @@ const JobDetail = () => {
         </TabsContent>
 
         <TabsContent value="reports" className="mt-6">
-          <JobReports jobId={job.id} />
+          <div className="space-y-8">
+            <JobReports jobId={job.id} />
+
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold mb-4">Status Updates</h2>
+              {/* Use the API-based component when in production, and the mock data component when in development */}
+              {process.env.NODE_ENV === 'production' ? (
+                <StatusUpdatesApi jobId={job.id} />
+              ) : (
+                <StatusUpdates jobId={job.id} />
+              )}
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

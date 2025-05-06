@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useData } from "@/contexts/DataContext";
+import { useApiData } from "@/contexts/ApiDataContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,20 +14,21 @@ interface StatusUpdateFormProps {
 
 export const StatusUpdateForm: React.FC<StatusUpdateFormProps> = ({ jobId }) => {
   const { currentUser } = useAuth();
-  const { addStatusUpdate, getJobById } = useData();
+  const { getJobById } = useData();
+  const { addStatusUpdate, fetchStatusUpdates } = useApiData();
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const job = getJobById(jobId);
-  
+
   // Only architects assigned to this job can submit status updates
   if (currentUser?.role !== "architect" || job?.architectId !== currentUser.id) {
     return null;
   }
-  
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!content.trim()) {
       toast({
         title: "Error",
@@ -35,22 +37,22 @@ export const StatusUpdateForm: React.FC<StatusUpdateFormProps> = ({ jobId }) => 
       });
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
-      addStatusUpdate({
+      await addStatusUpdate({
         jobId,
         architectId: currentUser.id,
         content: content.trim()
       });
-      
+
+      // Refresh the status updates list
+      await fetchStatusUpdates(jobId);
+
       setContent("");
-      toast({
-        title: "Success",
-        description: "Status update submitted successfully"
-      });
     } catch (error) {
+      console.error('Error submitting status update:', error);
       toast({
         title: "Error",
         description: "Failed to submit status update",
@@ -60,7 +62,7 @@ export const StatusUpdateForm: React.FC<StatusUpdateFormProps> = ({ jobId }) => 
       setIsSubmitting(false);
     }
   };
-  
+
   return (
     <Card>
       <CardHeader>

@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { DataProvider } from "@/contexts/DataContext";
+import { ApiDataProvider } from "@/contexts/ApiDataContext";
+import { WebSocketProvider } from "@/contexts/WebSocketContext";
 import { Navbar } from "@/components/Navbar";
 import { Sidebar } from "@/components/Sidebar";
 import { JobStatusNotificationBell } from "@/components/jobs/JobStatusNotificationBell";
@@ -28,15 +30,15 @@ const queryClient = new QueryClient();
 // Protected route wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { currentUser, isLoading } = useAuth();
-  
+
   if (isLoading) {
     return <div className="h-screen flex items-center justify-center">Loading...</div>;
   }
-  
+
   if (!currentUser) {
     return <Navigate to="/login" />;
   }
-  
+
   return (
     <div className="flex">
       <Sidebar />
@@ -56,15 +58,15 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 // Route that redirects to dashboard if already logged in
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { currentUser, isLoading } = useAuth();
-  
+
   if (isLoading) {
     return <div className="h-screen flex items-center justify-center">Loading...</div>;
   }
-  
+
   if (currentUser) {
     return <Navigate to="/dashboard" />;
   }
-  
+
   return <>{children}</>;
 };
 
@@ -75,7 +77,7 @@ const AppRoutes = () => {
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-      
+
       {/* Protected routes */}
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
@@ -85,7 +87,7 @@ const AppRoutes = () => {
       <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-      
+
       {/* Catch-all route */}
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -99,9 +101,13 @@ const App = () => (
       <Sonner />
       <AuthProvider>
         <DataProvider>
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
+          <ApiDataProvider>
+            <WebSocketProvider>
+              <BrowserRouter>
+                <AppRoutes />
+              </BrowserRouter>
+            </WebSocketProvider>
+          </ApiDataProvider>
         </DataProvider>
       </AuthProvider>
     </TooltipProvider>
