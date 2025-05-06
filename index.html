@@ -15,10 +15,12 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@architex" />
     <meta name="twitter:image" content="/opengraph-image.png" />
-    
+
     <!-- Security headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://assets.calendly.com https://calendly.com https://*.calendly.com https://js.stripe.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://assets.calendly.com https://*.calendly.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://api.dicebear.com https://www.googletagmanager.com https://*.calendly.com assets/projects/; connect-src 'self' https://api.architex.com wss://api.architex.com https://www.google-analytics.com https://www.googletagmanager.com https://*.calendly.com; frame-src 'self' https://assets.calendly.com https://calendly.com https://*.calendly.com">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
   </head>
 
